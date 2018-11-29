@@ -32,21 +32,21 @@ This is a simple API allowing consumers to view or find or create or delete ship
     + body
 
             {
-                "shippingDate": "2018-12-05T15:00:00Z",    <-- (1)
+                "shippingDate": "2018-12-05T15:00:00Z",
                 "product": {
-                    "id": 10233    <-- (2)
+                    "id": 10233
                 },
                 "salesOrder": {
-                    "id": 492,    <-- (3)
-                    "orderNumber": "76532-28"   <-- (4)
+                    "id": 492,
+                    "orderNumber": "76532-28"
                 },
-                "qty": 500,   <-- (5)
-                "price": 5251,   <-- (6)
-                "destination": "藤商事",   <-- (7)
-                "notes": "初回納品",   <-- (8)
+                "qty": 500,
+                "price": 5251,
+                "destination": "藤商事",
+                "notes": "初回納品",
                 "location": {
                     "store": null,
-                    "code": "02"   <-- (9)
+                    "code": "02"
                 }
             }
 
