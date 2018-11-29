@@ -77,13 +77,13 @@ This is a simple API allowing consumers to view or find or create or delete ship
             }
 
 + Response 200 (application/json)
-    + Attributes (deletedResult)
+    + Attributes (deletedResults)
         
 + Response 404 (application/json)
-    + Attributes (deletedResult)
+    + Attributes (deletedResults)
 
 + Response 409 (application,json)
-    + Attributes (deletedResult)
+    + Attributes (deletedResults)
 
 ## Get Shipping Order By Id [/shippingorders/{id}]
 
@@ -149,5 +149,5 @@ This is a simple API allowing consumers to view or find or create or delete ship
     + status: `error` (string) - Status
     + message: `message` (string) - Error message
 
-### deletedResult
+### deletedResults
     + result: `result` (array) - Result details
