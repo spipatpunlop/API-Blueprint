@@ -1,147 +1,236 @@
 FORMAT: 1A
-HOST: localhost:4852/v1/sales/
+HOST: https://twics.tamurasouko.com
+ 
+# ZAICO API Document
+このドキュメントはZAICO APIの機能と使うために必要なパラメータなどを説明するものです。
 
-# Amus - Shipping Orders API Document
+# Group 認証
+## 認証について
+### GET
+#### 概要
+ZAICO APIは認証にBearerトークン認証を採用しています。
+リクエストを送る際、HTTPヘッダにAuthorization: Bearerをつけてください。
 
-This is a simple API allowing consumers to view or find or create or delete shipping orders.
+```http
+Authorization: Bearer YOUR_TOKEN_HERE
+```
 
-## Shipping Orders [/shippingorders]
 
-### All [GET]
+# Group 在庫データ
+
+## 在庫データ一覧取得 [/api/v1/inventories]
+### GET
+#### 処理概要
+  * 自分のアカウントに登録されている在庫データのすべてを返します。
+  * 在庫データが1件も無い場合は、空の配列を返します。
+  + Request
+    + Headers
+      Authorization: Bearer YOUR_TOKEN
+      Content-Type: application/json
+
+  + Response 200 (application/json)
+    + Attributes (InventoriesViews)
+
+
+
+## 在庫データ作成 [/api/v1/inventories]
+### POST
+#### 処理概要
+  * 在庫データを作成します
+
+#### 注意事項
+  * タイトルのみあれば作成可能です
+  * 画像もつけてデータを作成する場合は、画像をbase64エンコードして送ってください
+  * 送られたパラメータにタイトルが無い場合やデータが無い場合はエラーを返します
+  * パースできないJSONを送るとエラーを返します
+  * 存在しないユーザーグループを送るとエラーを返します
+  * 変更履歴のメモも一緒に保存することが可能です。詳しくは下記Bodyをご覧ください
 
 + Request
+  + Headers
+    Authorization: Bearer YOUR_TOKEN
+    Content-Type: application/json
 
-    + Headers
-    
-            Authorization: Bearer TOKEN
-
-+ Response 200 (application/json)
-    + Attributes (dataItemAndTotal)
-
-+ Response 403 (application/json)
-    + Attributes (statusForbidden)
-        
-### Create [POST]
-
-+ Request (application/json)
-
-    + Headers
-    
-            Authorization: Bearer TOKEN
-
-    + body
-
-            {
-                "shippingDate": "2018-12-05T15:00:00Z",
-                "product": {
-                    "id": 10233
-                },
-                "salesOrder": {
-                    "id": 492,
-                    "orderNumber": "76532-28"
-                },
-                "qty": 500,
-                "price": 5251,
-                "destination": "藤商事",
-                "notes": "初回納品",
-                "location": {
-                    "store": null,
-                    "code": "02"
-                }
-            }
-
-+ Response 200 (appication/json)
-    + Attributes (dataItemAndUserAC)
-
-### Delete [DELETE]
-
-+ Request (application/json)
-
-    + Headers
-    
-            Authorization: Bearer TOKEN
-
-    + body
-
-            {
-                "data": [
-                    {
-                        "id": 1,
-                        "version": 0
-                    },
-                    {
-                        "id": 2,
-                        "version": 0
-                    }
-                ]
-            }
+  + Params
+    + Attributes (InventoryCreateParams)
 
 + Response 200 (application/json)
-    + Attributes (deletedResults)
+  + Attributes (InventoryCreateSuccessfully)
 
-## Get Shipping Order By Id [/shippingorders/{id}]
++ Response 400 (application/json)
+  + Attributes (BadRequestNoData)
 
-### Get [GET]
++ Response 406 (application/json)
+  + Attributes (UserGroupNotExist)
+
+
+
+## 在庫データ個別取得 [/api/v1/inventories/{id}]
+### GET
+#### 処理概要
+ * 在庫データを1件のみ取得します
+
+### 注意事項
+  * 在庫データが無い場合は404を返します
 
 + Parameters
-    + id (number) - Id of Shipping Order in the form of long
-    
-+ Request
+  + id: 1 (number, required) - 在庫データのID
 
-    + Headers
-    
-            Authorization: Bearer TOKEN
++ Request
+  + Headers
+    Authorization: Bearer YOUR_TOKEN
+    Content-Type: application/json
 
 + Response 200 (application/json)
-    + Attributes (dataItemAndUserAC)
-        
-## Sorting Shipping Orders [/shippingorders{?sort}{?dir}]
+  + Attributes (InventoriesViews)
 
-### Sort [GET]
++ Response 404 (application/json)
+  + Attributes (InventoryNotFound)
+
+
+
+## 在庫データ更新 [/api/v1/inventories/{id}]
+### PUT
+#### 処理概要
+  * 特定の在庫データを更新します
+
+#### 注意事項
+  * タイトルのみあれば作成可能です
+  * 画像もつけてデータを作成する場合は、画像をbase64エンコードして送ってください
+  * 該当する在庫データが無い場合はエラーを返します
+  * パースできないJSONを送るとエラーを返します
+  * 存在しないユーザーグループを送るとエラーを返します
+  * 変更履歴のメモも一緒に保存することが可能です。詳しくは下記Bodyをご覧ください
 
 + Parameters
-    + sort (string) - Item name of sorting
-    + dir (string) - Direction od sorting (ascend/descend)
+  + id: 1 (number, required) - 在庫データのID
 
 + Request
+  + Headers
+    Authorization: Bearer YOUR_TOKEN
+    Content-Type: application/json
 
-    + Headers
-                
-            Authorization: Bearer TOKEN
+  + Params
+    + Attributes (InventoryCreateParams)
 
 + Response 200 (application/json)
-    + Attributes (dataItemAndTotal)
-        
-## Find Shipping Orders by keyword [/shippingorders{?keyword}]
+  + Attributes (InventoryUpdateSuccessfully)
 
-### Find [GET]
++ Response 400 (application/json)
+  + Attributes (BadRequestNoData)
+
++ Response 404 (application/json)
+  + Attributes (InventoryNotFound)
+
++ Response 406 (application/json)
+  + Attributes (UserGroupNotExist)
+
+
+## 在庫データ削除 [/api/v1/inventories/{id}]
+### DELETE
+#### 処理概要
+  * 特定の在庫データを削除します
+
+#### 注意事項
+  * 該当する在庫データが無い場合はエラーを返します
 
 + Parameters
-    + keyword (string) - keyword
+  + id: 1 (number, required) - 在庫データのID
 
 + Request
-
-    + Headers
-        
-            Authorization: Bearer TOKEN
+  + Headers
+    Authorization: Bearer YOUR_TOKEN
+    Content-Type: application/json
 
 + Response 200 (application/json)
-    + Attributes (dataItemAndTotal)
+  + Attributes (InventoryDeleteSuccessfully)
+
++ Response 404 (application/json)
+  + Attributes (InventoryNotFound)
+  
 
 ## Data Structures
+### InventoryCreateSuccessfully
+  + code: 200 (number) - ステータスコード
+  + status: `success` (string) - 状態
+  + message: `Data was successfully created.` (string) - メッセージ
+  + data_id: `123456` (number) - 作成した在庫データのID
 
-### dataItemAndTotal
-    + data: `data` (array) - Collections of Data
-    + total: `total` (number) - number of total records
-    
-### dataItemAndUserAC
-    + doc: `doc` (array) - Data details
-    + userAC: `userAC` (array) - User account details
+### InventoryUpdateSuccessfully
+  + code: 200 (number) - ステータスコード
+  + status: `success` (string) - 状態
+  + message: `Data was successfully updated.` (string) - メッセージ
 
-### statusForbidden
-    + code: 403 (number) - Status Code
-    + status: `error` (string) - Status
-    + message: `message` (string) - Error message
+### InventoryDeleteSuccessfully
+  + code: 200 (number) - ステータスコード
+  + status: `success` (string) - 状態
+  + message: `Data was successfully deleted.` (string) - メッセージ
 
-### deletedResults
-    + result: `result` (array) - Result details
+### InventoryCreateParams
++ title: `在庫データ` (string, required) - 在庫データタイトル
++ quantity: 10 (number) - 数量
++ unit: `個` (string) - 単位
++ category: `製品` (string) - カテゴリ
++ state: `新品` (string) - 状態
++ place: `ZAICO倉庫` (string) - 保管場所
++ etc: `備考` (string) - 備考
++ code: `tw201800000000` (string) - バーコードの値
++ item_image: `base64-encoded-image` (string)
++ stocktake
+  + checked_at: `2018-03-27T09:38:19+09:00` (string) - 棚卸し日
++ optional_attributes (array[object],fixed-type)
+  + (object)
+      + name: `追加項目名` (string) - 追加項目名
+      + value: `追加項目値` (string) - 追加項目値
++ inventory_history
+  + (object)
+    + memo: `変更履歴メモ` (string) - 変更履歴のメモ
+
+### InventoriesViews
++ id: 1 (number) - ID
++ title: `在庫データ` (string) - 在庫データタイトル
++ quantity: 10 (number) - 数量
++ unit: `個` (string) - 単位
++ category: `製品` (string) - カテゴリ
++ state: `新品` (string) - 状態
++ place: `ZAICO倉庫` (string) - 保管場所
++ etc: `備考` (string) - 備考
++ code: `tw201800000000` (string) - バーコードの値
++ item_image (object)
+  + url: `itemimageurl` (string) - 画像URL
++ stocktake
+  + checked_at: `2018-03-27T09:38:19+09:00` (string) - 棚卸し日
++ optional_attributes (array[object],fixed-type)
+  + (object)
+      + name: `追加項目名` (string) - 追加項目名
+      + value: `追加項目値` (string) - 追加項目値
++ created_at: `2018-03-27T09:38:19+09:00` (string) - 作成日
++ updated_at `2018-03-27T09:38:19+09:00` (string) - 更新日
++ create_user_name: `田村 太郎` (string) - 作成者
++ update_user_name: `田村 次郎` (string) - 更新者
++ user_group: `基本グループ` (string) - ユーザーグループ
+
+### InventoryNotFound
++ code: 404 ( number ) - ステータスコード
++ status: `error` ( string ) - ステータス
++ message: `Inventory not found` ( string ) - エラー内容
+
+### BadRequestNoData
++ code: 400 ( number ) - ステータスコード
++ status: `error` ( string ) - ステータス
++ message: `error message` ( string ) - エラー内容
+
+### UserGroupNotExist
++ code: 406 ( number ) - ステータスコード
++ status: `error` ( string ) - ステータス
++ message: `UserGroup is NOT exist` ( string ) - エラー内容
+
+### UnprocessableEntity
++ code: 422 ( number ) - ステータスコード
++ status: `error` ( string ) - ステータス
++ message: `error message` ( string ) - エラー内容
+
+### InternalServerErrorResponse
++ code: 503 ( number ) - ステータスコード
++ status: `error` ( string ) - ステータス
++ message: `error message` ( string ) - エラー内容
